@@ -1,1 +1,1 @@
-drop table notes;
+drop table if exists notes;

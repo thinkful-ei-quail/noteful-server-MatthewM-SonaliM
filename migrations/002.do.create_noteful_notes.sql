@@ -8,6 +8,5 @@ CREATE TABLE Notes
   noteName text NOT NULL,
   content text NOT NULL,
   modified TIMESTAMPTZ NOT NULL default now(),
-  folderId text NOT NULL,
-  foreign key(folderId) REFERENCES Folders(id) on delete cascade not null
+  folderId uuid REFERENCES Folders(id) ON DELETE CASCADE SET NULL
 );

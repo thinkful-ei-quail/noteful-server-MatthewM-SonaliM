@@ -10,7 +10,6 @@ const { expect } = require('chai');
 describe('NOTEFUL endpoints', () => {
   let db;
   before('establish knex instance', () => {
-    console.log(process.env.TEST_DB_URL);
     db = knex({
       client: 'pg',
       connection: process.env.TEST_DB_URL
@@ -303,4 +302,47 @@ describe('NOTEFUL endpoints', () => {
         });
     });
   });
+
+  describe.only('DELETE /notes/:noteid endpoint', ()=> {
+    //delete when theres no folder
+    context('there are no folders in the database', () => {
+      it('responds with 404 no data found',() => {
+        return supertest(app)
+          .delete(`/notes/bbb2bb1a-e666-11ea-adc1-0242ac120002`)
+          .expect(404, { error: { message: 'Note does not exist' }});
+
+      });
+    });
+    //delete when folder and notes 
+
+    context('there are folders and notes in database', () => {
+      const testFolders = makeFoldersArray();
+      const testNotes = makeNotesArray();
+      beforeEach('insert folders to database', () => {
+        return db('folders')
+          .insert(testFolders)
+          .then(()=> {
+            return db('notes')
+              .insert(testNotes);
+          });
+      });
+
+      it('should delete a note when id provided', () => {
+        const expectedNotes = testNotes.filter(note => note.id !== 'e14a3a91-e17a-42c9-b1d0-59ae241c9da6');
+        return supertest(app)
+          .delete('/notes/e14a3a91-e17a-42c9-b1d0-59ae241c9da6')
+          .expect(204)
+          .then( () => {
+            return supertest(app)
+              .get('/notes')
+              .then(res => {
+                expect(200);
+                expect(res.body).to.eql(expectedNotes);
+              });
+          });
+      });
+
+    });
+  });
+
 });

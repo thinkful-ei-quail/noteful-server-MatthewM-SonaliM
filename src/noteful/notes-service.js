@@ -9,6 +9,9 @@ const NotesService ={
 
   createNote(db, newNote) {
     return db('notes').insert(newNote).returning('*').then(rows => rows[0]);
+  },
+  deleteNote(db, id) {
+    return db('notes').where({ id }).delete();
   }
 };
 

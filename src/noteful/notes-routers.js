@@ -27,7 +27,6 @@ notesRouter
   .post(parseBody, (req, res, next) => {
     const { note_name, content, folder_id } = req.body;
     const newNote = { note_name, content, folder_id};
-    console.log(newNote);
     for (const [key, value] of Object.entries(newNote))
       if (value == null)
         return res.status(400).json({
@@ -59,6 +58,19 @@ notesRouter
   })
   .get((req, res, next) => {
     res.json(serializeNote(res.note));
+  })
+  .delete((req, res, next) => {
+    const noteId = req.params.noteid;
+
+
+    NoteService.deleteNote(req.app.get('db'), noteId)
+      .then(numRowsAffected => {
+        if(!numRowsAffected){
+          res.status(404).send({ error: { message: 'Note does not exist' }});
+        }
+        res.status(204).end();
+      })
+      .catch(next);
   });
 
 module.exports = notesRouter;

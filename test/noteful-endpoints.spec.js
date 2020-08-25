@@ -54,7 +54,7 @@ describe('NOTEFUL endpoints', () => {
           .insert(maliciousFolder);
       });
 
-      it.only('Removes XSS attack content', () => {
+      it('Removes XSS attack content', () => {
         return supertest(app)
           .get('/folders')
           .expect(200)
@@ -150,7 +150,9 @@ describe('NOTEFUL endpoints', () => {
         return supertest(app)
           .get('/notes')
           .expect(200)
-          .expect(expectedNote);
+          .expect(res => {
+            expect(res.body[0]).to.eql(expectedNote);
+          });
       });
     });
   });
@@ -198,7 +200,6 @@ describe('NOTEFUL endpoints', () => {
   });
 
   describe('POST /folders', () => {
-    // add when XSS attack 
     it('creates a folder responding with 201 with new folder', () => {
       const newFolder = {
         folder_name: 'New Folder'
@@ -243,6 +244,63 @@ describe('NOTEFUL endpoints', () => {
     });
   });
   
-  
+  describe('POST /notes', () => {
+    const testFolders = makeFoldersArray();
+    beforeEach('Create test folderd', () => {
+      return db('folders')
+        .insert(testFolders);
+    });
 
+    it('Create a new note responding with 201 with a new note', () => {
+      const testNote = makeNotesArray()[0];
+      return supertest(app)
+        .post('/notes')
+        .send(testNote)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.note_name).to.eql(testNote.note_name);
+          expect(res.body.content).to.eql(testNote.content);
+          expect(res.body.folder_id).to.eql(testNote.folder_id);
+          expect(res.body).to.have.property('id');
+          expect(res.headers.location).to.eql(`/notes/${res.body.id}`);
+        })
+        .then(res => 
+          supertest(app)
+            .get(`/notes/${res.body.id}`)
+            .expect(res.body)
+        );
+    });
+
+    const requiredFields = ['note_name', 'content', 'folder_id'];
+    requiredFields.forEach(field => {
+      const newNote = {
+        note_name: 'Test new note',
+        content: 'Test new conent',
+        folder_id: 'bbb2bb1a-e666-11ea-adc1-0242ac120002'
+      };
+
+      it(`Responds with a 400 and an error message when the '${field}' is missing`, () => {
+        delete newNote[field];
+        return supertest(app)
+          .post('/notes')
+          .send(newNote)
+          .expect(400, {error: {message: `Missing '${field}' in request body`}});
+      });
+    });
+
+    it('Removes xss attack content from the response', () => {
+      const { maliciousNote, expectedNote } = makeMaliciousNoteEntry();
+      return supertest(app)
+        .post('/notes')
+        .send(maliciousNote)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.note_name).to.eql(expectedNote.note_name);
+          expect(res.body.content).to.eql(expectedNote.content);
+          expect(res.body).to.have.property('id');
+          expect(res.body).to.have.property('modified');
+          expect(res.body).to.have.property('folder_id');
+        });
+    });
+  });
 });

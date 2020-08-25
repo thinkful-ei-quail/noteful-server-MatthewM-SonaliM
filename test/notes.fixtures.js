@@ -25,24 +25,20 @@ function makeNotesArray(){
 }
 
 function makeMaliciousNoteEntry() {
-  const maliciousNote = [
-    {
-      id: 'b5d84772-a26b-4b16-a976-62f1bd37b8e6',
-      note_name: 'evil note <script>alert("xss");</script',
-      content: 'evil note content <script>alert("xss");</script',
-      modified: '2020-08-25T08:34:13.000Z',
-      folder_id: 'cbf183f8-e666-11ea-adc1-0242ac120002'
-    }
-  ];
-  const expectedNote = [
-    {
-      id: 'b5d84772-a26b-4b16-a976-62f1bd37b8e6',
-      note_name: 'evil note &lt;script&gt;alert("xss");&lt;/script',
-      content: 'evil note content &lt;script&gt;alert("xss");&lt;/script',
-      modified: '2020-08-25T08:34:13.000Z',
-      folder_id: 'cbf183f8-e666-11ea-adc1-0242ac120002'
-    }
-  ];
+  const maliciousNote = {
+    id: 'b5d84772-a26b-4b16-a976-62f1bd37b8e6',
+    note_name: 'evil note <script>alert("xss");</script',
+    content: 'evil note content <script>alert("xss");</script',
+    modified: '2020-08-25T08:34:13.000Z',
+    folder_id: 'cbf183f8-e666-11ea-adc1-0242ac120002'
+  };
+  const expectedNote = {
+    id: 'b5d84772-a26b-4b16-a976-62f1bd37b8e6',
+    note_name: 'evil note &lt;script&gt;alert("xss");&lt;/script',
+    content: 'evil note content &lt;script&gt;alert("xss");&lt;/script',
+    modified: '2020-08-25T08:34:13.000Z',
+    folder_id: 'cbf183f8-e666-11ea-adc1-0242ac120002'
+  };
 
   return {
     maliciousNote,

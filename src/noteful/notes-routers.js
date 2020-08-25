@@ -2,6 +2,7 @@ const express = require('express');
 const {v4: uuid} = require('uuid');
 const xss = require('xss');
 const NoteService = require('./notes-service');
+const path = require('path');
 
 const notesRouter = express.Router();
 const parseBody = express.json();
@@ -20,6 +21,25 @@ notesRouter
     NoteService.getAllNotes(req.app.get('db'))
       .then(notes => {
         res.json(notes.map(serializeNote));
+      })
+      .catch(next);
+  })
+  .post(parseBody, (req, res, next) => {
+    const { note_name, content, folder_id } = req.body;
+    const newNote = { note_name, content, folder_id};
+    console.log(newNote);
+    for (const [key, value] of Object.entries(newNote))
+      if (value == null)
+        return res.status(400).json({
+          error: {message: `Missing '${key}' in request body`}
+        });
+    
+    NoteService.createNote(req.app.get('db'), newNote)
+      .then(note => {
+        res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${note.id}`))
+          .json(serializeNote(note));
       })
       .catch(next);
   });

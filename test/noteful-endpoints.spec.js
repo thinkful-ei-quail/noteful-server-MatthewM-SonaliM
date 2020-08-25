@@ -9,6 +9,7 @@ const { expect } = require('chai');
 describe('NOTEFUL endpoints', () => {
   let db;
   before('establish knex instance', () => {
+    console.log(process.env.TEST_DB_URL);
     db = knex({
       client: 'pg',
       connection: process.env.TEST_DB_URL
@@ -82,5 +83,14 @@ describe('NOTEFUL endpoints', () => {
     //   beforeEach()
     // })
   });
-
+  
+  describe('GET /notes', () => {
+    context('Given no notes in the database.', () => {
+      it('Returns with a 200 and an empty array.', () => {
+        return supertest(app)
+          .get('/notes')
+          .expect(200, []);
+      });
+    });
+  });
 });

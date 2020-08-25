@@ -76,11 +76,11 @@ describe('NOTEFUL endpoints', () => {
       });
     });
 
-    context.only('Given there are folders in the folder database', () => {
-      const foldersArray = makeFoldersArray();
+    // context.('Given there are folders in the folder database', () => {
+    //   const foldersArray = makeFoldersArray();
 
-      beforeEach()
-    })
+    //   beforeEach()
+    // })
   });
 
 });

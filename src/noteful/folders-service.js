@@ -8,7 +8,7 @@ const FoldersService ={
       .where('id', folderId)
       .first();
   },
-  createNewFolder(db, newFolder) {
+  insertNewFolder(db, newFolder) {
     return db('folders')
       .insert(newFolder)
       .returning('*')

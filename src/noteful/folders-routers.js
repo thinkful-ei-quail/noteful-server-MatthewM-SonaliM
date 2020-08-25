@@ -3,6 +3,7 @@ const {v4: uuid} = require('uuid');
 const xss = require('xss');
 const FolderService = require('./folders-service');
 const { restart } = require('nodemon');
+const path = require('path')
 
 const foldersRouter = express.Router();
 const parseBody = express.json();
@@ -26,8 +27,18 @@ foldersRouter
   .post(parseBody, (req, res, next) => {
     const { folder_name } = req.body;
     const newFolder = { folder_name };
+    if(!newFolder.folder_name) {
+      res.status(400).json({ error : { message: 'Folder name is required' } });
+    }
 
-    FolderService.createNewFolder(req.app.get('db'), folder_name);
+    FolderService.insertNewFolder(req.app.get('db'), newFolder)
+      .then(folder => {
+        return res
+          .status(201)
+          .location(path.posix.join(req.originalUrl, `/${folder.id}`))
+          .json(serializeFolder(folder));
+      })
+      .catch(next);
   });
 
 

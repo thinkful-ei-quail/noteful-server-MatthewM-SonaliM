@@ -54,14 +54,13 @@ describe('NOTEFUL endpoints', () => {
           .insert(maliciousFolder);
       });
 
-      it('Removes XSS attack content', () => {
+      it.only('Removes XSS attack content', () => {
         return supertest(app)
           .get('/folders')
           .expect(200)
-          .expect(res => {
-            // ask during mentor seesion
-            expect(res.body[0].id).to.eql(expectedFolder[0].id);
-            expect(res.body[0].folder_name).to.eql(expectedFolder[0].folder_name);
+          .then(res => {
+            expect(res.body[0].id).to.eql(expectedFolder.id);
+            expect(res.body[0].folder_name).to.eql(expectedFolder.folder_name);
           });
       });
     });
@@ -198,8 +197,7 @@ describe('NOTEFUL endpoints', () => {
     });
   });
 
-  describe.only('POST /folders', () => {
-    // add when folder is not formatted properly
+  describe('POST /folders', () => {
     // add when XSS attack 
     it('creates a folder responding with 201 with new folder', () => {
       const newFolder = {
@@ -207,10 +205,44 @@ describe('NOTEFUL endpoints', () => {
       };
 
       return supertest(app)
-        .post('/folder')
+        .post('/folders')
         .send(newFolder)
         .expect(201)
-        .expect(newFolder.name);
+        .expect(res => {
+          expect(res.body.folder_name).to.eql(newFolder.folder_name);
+          expect(res.body.id);
+        });
+    });
+
+    it('returns 400 when there is no folder name provided', () =>{
+      const newFolder = {
+        folder_name: ''
+      };
+
+      return supertest(app)
+        .post('/folders')
+        .send(newFolder)
+        .expect(400, { error : { message: 'Folder name is required' } });
+    });
+
+    it('Removes malicious XSS attack before inserting', () => {
+      const { maliciousFolder, expectedFolder } = makeMaliciousEntry();
+      
+      return supertest(app)
+        .post('/folders')
+        .send(maliciousFolder)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.folder_name).to.eql(expectedFolder.folder_name);
+        })
+        .then(res => 
+          supertest(app)
+            .get(`/folders/${res.body.id}`)
+            .expect(res.body)
+        );
     });
   });
+  
+  
+
 });

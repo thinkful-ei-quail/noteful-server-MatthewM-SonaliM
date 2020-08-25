@@ -24,4 +24,21 @@ notesRouter
       .catch(next);
   });
 
+notesRouter
+  .route('/notes/:noteid')
+  .get((req, res, next) => {
+    const { noteid } = req.params;
+    NoteService.getNoteById(req.app.get('db'), noteid)
+      .then(note => {
+        if (!note) {
+          return res.status(404).json({error: {message: 'Note does not exist'}});
+        }
+        res.note = note;
+        next();
+      });
+  })
+  .get((req, res, next) => {
+    res.json(serializeNote(res.note));
+  });
+
 module.exports = notesRouter;

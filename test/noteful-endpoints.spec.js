@@ -3,6 +3,7 @@ const knex = require('knex');
 const app = require('../src/app');
 const supertest = require('supertest');
 const { makeFoldersArray, makeMaliciousEntry } = require('./folders.fixtures');
+const { makeNotesArray, makeMaliciousNoteEntry } = require('./notes.fixtures');
 const e = require('express');
 const { expect } = require('chai');
 
@@ -46,7 +47,6 @@ describe('NOTEFUL endpoints', () => {
     });
 
     context('Given an XSS attack folder', () => {
-      const testFolders = makeFoldersArray();
       const { maliciousFolder, expectedFolder } = makeMaliciousEntry();
 
       beforeEach('insert malicious entry', () => {
@@ -110,6 +110,90 @@ describe('NOTEFUL endpoints', () => {
         return supertest(app)
           .get('/notes')
           .expect(200, []);
+      });
+    });
+
+    context('Given there are notes in the database.', () => {
+      const testFolders = makeFoldersArray();
+      const testNotes = makeNotesArray();
+
+      beforeEach('Insert folders into database', () => {
+        return db('folders')
+          .insert(testFolders);
+      });
+      beforeEach('Insert notes into database', () => {
+        return db('notes')
+          .insert(testNotes);
+      });
+
+      it('Responds with 200 and returns all of the notes', () => {
+        return supertest(app)
+          .get('/notes')
+          .expect(200, testNotes);
+      });
+    });
+
+    context('Given an XSS attack notes', () => {
+      const testFolders = makeFoldersArray();
+      const { maliciousNote, expectedNote } = makeMaliciousNoteEntry();
+
+      beforeEach('Insert folders into database', () => {
+        return db('folders')
+          .insert(testFolders);
+      });
+
+      beforeEach('Insert malicious note entry', () => {
+        return db('notes')
+          .insert(maliciousNote);
+      });
+
+      it('Removes malicious XSS attack content', () => {
+        return supertest(app)
+          .get('/notes')
+          .expect(200)
+          .expect(expectedNote);
+      });
+    });
+  });
+
+  describe('GET /notes/:noteid', () => {
+    context('Given no notes', () => {
+      it('Responds with a 404', () => {
+        const noteId = '6336f40d-33c2-45cd-937c-3f955f6f95db';
+        return supertest(app)
+          .get(`/notes/${noteId}`)
+          .expect(404, {error: { message: 'Note does not exist'}});
+      });
+    });
+
+    context('Given there are notes in the database.', () => {
+      const testFolders = makeFoldersArray();
+      const testNotes = makeNotesArray();
+
+      beforeEach('Insert folders and notes into database', () => {
+        return db
+          .into('folders')
+          .insert(testFolders)
+          .then(() => {
+            return db
+              .into('notes')
+              .insert(testNotes);
+          });
+
+      });
+
+      it('Responds with 404 if note id does not exist', () => {
+        const noteId = '7336f40d-33c2-45cd-937c-3f955f6f95db';
+        return supertest(app)
+          .get(`/notes/${noteId}`)
+          .expect(404, {error: {message: 'Note does not exist'}});
+      });
+
+      it('Returns the specified note from the database', () => {
+        const expectedNote = testNotes[1];
+        return supertest(app)
+          .get('/notes/e14a3a91-e17a-42c9-b1d0-59ae241c9da6')
+          .expect(200, expectedNote);
       });
     });
   });

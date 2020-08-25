@@ -44,7 +44,7 @@ describe('NOTEFUL endpoints', () => {
       });
     });
 
-    context.only('Given an XSS attack folder', () => {
+    context('Given an XSS attack folder', () => {
       const testFolders = makeFoldersArray();
       const { maliciousFolder, expectedFolder } = makeMaliciousEntry();
 
@@ -64,6 +64,23 @@ describe('NOTEFUL endpoints', () => {
           });
       });
     });
+  });
+
+  describe('/GET /folders/:folder_id', () => {
+    context('Given no folders', () => {
+      it('responds with 404', () => {
+        const folderId = 'cbf183f8-e666-11ea-adc1-0242ac130004';
+        return supertest(app)
+          .get(`/folders/${folderId}`)
+          .expect(404, { error: { message: 'Folder does not exist' } } );
+      });
+    });
+
+    context.only('Given there are folders in the folder database', () => {
+      const foldersArray = makeFoldersArray();
+
+      beforeEach()
+    })
   });
 
 });

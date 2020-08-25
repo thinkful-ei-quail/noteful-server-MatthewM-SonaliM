@@ -197,4 +197,20 @@ describe('NOTEFUL endpoints', () => {
       });
     });
   });
+
+  describe.only('POST /folders', () => {
+    // add when folder is not formatted properly
+    // add when XSS attack 
+    it('creates a folder responding with 201 with new folder', () => {
+      const newFolder = {
+        folder_name: 'New Folder'
+      };
+
+      return supertest(app)
+        .post('/folder')
+        .send(newFolder)
+        .expect(201)
+        .expect(newFolder.name);
+    });
+  });
 });

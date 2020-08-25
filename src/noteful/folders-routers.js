@@ -22,6 +22,12 @@ foldersRouter
         res.json(folders.map(serializeFolder));
       })
       .catch(next);
+  })
+  .post(parseBody, (req, res, next) => {
+    const { folder_name } = req.body;
+    const newFolder = { folder_name };
+
+    FolderService.createNewFolder(req.app.get('db'), folder_name);
   });
 
 

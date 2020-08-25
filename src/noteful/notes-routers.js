@@ -8,13 +8,16 @@ const parseBody = express.json();
 
 const serializeNote = note => ({
   id: note.id,
-  folder_name: xss(note.folder_name),
+  note_name: xss(note.note_name),
+  content: xss(note.content),
+  modified: note.modified,
+  folder_id: note.folder_id
 });
 
 notesRouter
   .route('/notes')
   .get((req, res, next) => {
-    NoteService.getAllFolders(req.app.get('db'))
+    NoteService.getAllNotes(req.app.get('db'))
       .then(notes => {
         res.json(notes.map(serializeNote));
       })

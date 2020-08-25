@@ -31,7 +31,6 @@ foldersRouter
     const folderId = req.params.folder_id;
     FolderService.getFolderById(req.app.get('db'), folderId)
       .then(folder => {
-        console.log(folder)
         if (!folder) {
           return res.status(404).json({
             error: { message: 'Folder does not exist' }

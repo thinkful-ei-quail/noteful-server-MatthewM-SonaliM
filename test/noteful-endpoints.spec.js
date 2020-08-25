@@ -68,6 +68,7 @@ describe('NOTEFUL endpoints', () => {
   });
 
   describe('/GET /folders/:folder_id', () => {
+   
     context('Given no folders', () => {
       it('responds with 404', () => {
         const folderId = 'cbf183f8-e666-11ea-adc1-0242ac130004';
@@ -77,11 +78,30 @@ describe('NOTEFUL endpoints', () => {
       });
     });
 
-    // context.('Given there are folders in the folder database', () => {
-    //   const foldersArray = makeFoldersArray();
+    context('Given there are folders in the folder database', () => {
+      const foldersArray = makeFoldersArray();
 
-    //   beforeEach()
-    // })
+      beforeEach('insert folders into database', () => {
+        return db('folders')
+          .insert(foldersArray);
+      });
+
+      it('responds with 404, when folder id does not exist', () => {
+        const folderId = 'cbf183f8-e666-11ea-adc1-0242ac130004';
+        return supertest(app)
+          .get(`/folders/${folderId}`)
+          .expect(404, { error: { message: 'Folder does not exist' } } );
+      });
+
+      it('returns the specified folder from the database', () => {
+        let expectedFolder = foldersArray[1];
+        return supertest(app)
+          .get(`/folders/c6c75db2-e666-11ea-adc1-0242ac120002`)
+          .expect(200)
+          .expect(expectedFolder);
+      });
+
+    });
   });
   
   describe('GET /notes', () => {

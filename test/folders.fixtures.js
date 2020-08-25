@@ -6,7 +6,7 @@ function makeFoldersArray(){
     },
     {
       id: 'c6c75db2-e666-11ea-adc1-0242ac120002',
-      folder_name: 'Second Folder'
+      folder_name: 'Second Folder',
     },
     {
       id: 'cbf183f8-e666-11ea-adc1-0242ac120002',

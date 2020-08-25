@@ -1,9 +1,7 @@
 const express = require('express');
-const {v4: uuid} = require('uuid');
 const xss = require('xss');
 const FolderService = require('./folders-service');
-const { restart } = require('nodemon');
-const path = require('path')
+const path = require('path');
 
 const foldersRouter = express.Router();
 const parseBody = express.json();
@@ -28,7 +26,7 @@ foldersRouter
     const { folder_name } = req.body;
     const newFolder = { folder_name };
     if(!newFolder.folder_name) {
-      res.status(400).json({ error : { message: 'Folder name is required' } });
+      return res.status(400).json({ error : { message: 'Folder name is required' } });
     }
 
     FolderService.insertNewFolder(req.app.get('db'), newFolder)

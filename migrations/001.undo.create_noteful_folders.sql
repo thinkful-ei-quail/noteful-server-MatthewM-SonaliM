@@ -1,1 +1,1 @@
-drop table if exists Folders;
+DROP TABLE IF EXISTS folders;

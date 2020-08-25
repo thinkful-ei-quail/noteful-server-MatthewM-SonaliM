@@ -1,12 +1,12 @@
 create extension if not exists "uuid-ossp";
 
-drop table if exists Notes;
+DROP TABLE IF EXISTS notes;
 
-CREATE TABLE Notes
+CREATE TABLE notes
 (
-  id uuid PRIMARY KEY default uuid_generate_v4(),
-  note_name text NOT NULL,
-  content text NOT NULL,
-  modified TIMESTAMPTZ NOT NULL default now(),
-  folder_id uuid REFERENCES Folders(id) ON DELETE CASCADE NOT NULL
+  id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+  note_name TEXT NOT NULL,
+  content TEXT NOT NULL,
+  modified TIMESTAMPTZ NOT NULL DEFAULT now(),
+  folder_id uuid REFERENCES folders(id) ON DELETE CASCADE NOT NULL
 );

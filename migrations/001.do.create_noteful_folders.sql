@@ -1,10 +1,10 @@
 create extension if not exists "uuid-ossp";
 
-drop table if exists Folders;
+DROP TABLE IF EXISTS folders;
 
-CREATE TABLE Folders
+CREATE TABLE folders
 (
-  id uuid default uuid_generate_v4(),
-  folder_name text NOT NULL,
+  id uuid DEFAULT uuid_generate_v4(),
+  folder_name TEXT NOT NULL,
   PRIMARY KEY (id)
 );

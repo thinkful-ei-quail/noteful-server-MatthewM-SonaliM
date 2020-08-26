@@ -4,7 +4,6 @@ const app = require('../src/app');
 const supertest = require('supertest');
 const { makeFoldersArray, makeMaliciousEntry } = require('./folders.fixtures');
 const { makeNotesArray, makeMaliciousNoteEntry } = require('./notes.fixtures');
-const e = require('express');
 const { expect } = require('chai');
 
 describe('NOTEFUL endpoints', () => {
@@ -12,7 +11,7 @@ describe('NOTEFUL endpoints', () => {
   before('establish knex instance', () => {
     db = knex({
       client: 'pg',
-      connection: process.env.TEST_DB_URL
+      connection: process.env.TEST_DATABASE_URL
     });
     app.set('db', db);
   });

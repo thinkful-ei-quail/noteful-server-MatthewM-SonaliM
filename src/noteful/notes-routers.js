@@ -63,7 +63,7 @@ notesRouter
     NoteService.deleteNote(req.app.get('db'), noteId)
       .then(numRowsAffected => {
         if(!numRowsAffected){
-          res.status(404).send({ error: { message: 'Note does not exist' }});
+          res.status(404).json({ error: { message: 'Note does not exist' }});
         }
         res.status(204).end();
       })
